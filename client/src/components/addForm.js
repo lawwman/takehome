@@ -11,7 +11,7 @@ class AddForm extends React.Component {
 		this.setState({file: e.target.files[0], filename: e.target.files[0].name})
 	}
 
-	handleSubmit = e => {
+	handleSubmit = async e => {
 		e.preventDefault()
 
 		if (this.state.filename !== "" && this.state.filename.endsWith(".csv")) {
@@ -21,18 +21,20 @@ class AddForm extends React.Component {
 
 			formData.append("file", blob, this.state.filename)
 
+			await this.setState({file: '', filename: 'Choose file'})
+
 			fetch('./users/upload', {
 			method: 'POST',
 			body: formData
 			}).then(res => {
 				return res.json()
 			}).then(data => {
-				console.log(data.result)
+				if (data.result === "successful") console.log(data.result)
+				else console.log(data.err)
 			}).catch(() => {
 				console.log("something went wrong")
 			})
 		}
-		this.setState({file: '', filename: 'Choose file'})
 	}
 
 	render() {
