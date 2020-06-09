@@ -1,16 +1,20 @@
 import React from 'react';
 import './App.css';
-import Container from 'react-bootstrap/Container';
+
+import AddForm from './components/addForm'
 
 class App extends React.Component {
 
-  render() {
-    return (
-      <Container>
-      <h1>Testing</h1>
-      </Container>
-    );
-  }
+
+
+ 	render() {
+	    return (
+	    	<div className="container mt-4">
+	      		<h1>Testing</h1>
+	      		<AddForm />
+	      </div>
+	    );
+  	}
 }
 
 

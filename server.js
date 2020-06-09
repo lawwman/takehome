@@ -33,10 +33,10 @@ app.post('/users/upload', upload.single('file'), (req, res) => {
 	fs.readFile(req.file.path, 'utf8', function (err,data) {
 	  if (err) {
 	    return console.log(err)
-	    res.status(400).send("unsuccessful")  // for now return status 400
+	    res.status(400).json({result: "unsuccessful"})  // for now return status 400
 	  }
 	  console.log(data)
-	  res.status(200).send("successful")
+	  res.status(200).json({result: "successful"})
 	});
 	
 })
