@@ -6,7 +6,6 @@ class EmployeeCard extends React.Component {
 		return <div className="card text-white bg-dark mb-3">
 			  <div className="card-body">
 
-			  	<span className="card-title" style={indexStyle}>[{this.props.index}]</span>
 			  	<span className="card-title" style={labelStyle}>Login: </span>
 			  	<span className="card-title">{this.props.info.login}, </span>
 			  	<span className="card-title" style={labelStyle}>Name: </span>
@@ -18,11 +17,6 @@ class EmployeeCard extends React.Component {
 			  </div>
 			</div>
 	}
-}
-
-const indexStyle = {
-	color: "orange",
-	marginRight: '10px'
 }
 
 const labelStyle = {

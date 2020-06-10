@@ -40,7 +40,7 @@ class AddForm extends React.Component {
 	}
 
 	render() {
-		return  <form onSubmit={this.handleSubmit}>
+		return  <form onSubmit={this.handleSubmit} className="mb-4">
 					<div className="custom-file">
 					  <input type="file" className="custom-file-input" id="customFile" onChange={this.onChange} />
 					  <label className="custom-file-label" htmlFor="customFile">{this.state.filename}</label>
