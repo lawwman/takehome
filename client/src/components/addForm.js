@@ -8,6 +8,7 @@ class AddForm extends React.Component {
 	}
 
 	onChange = e => {
+		console.log(`File: ${e.target.files[0]} and Filename: ${e.target.files[0].name}`)
 		this.setState({file: e.target.files[0], filename: e.target.files[0].name})
 	}
 
@@ -20,8 +21,6 @@ class AddForm extends React.Component {
 			var blob = new Blob([this.state.file], {type: "text/csv"});
 
 			formData.append("file", blob, this.state.filename)
-
-			await this.setState({file: '', filename: 'Choose file'})
 
 			fetch('./users/upload', {
 			method: 'POST',
