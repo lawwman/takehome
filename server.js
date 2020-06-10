@@ -36,7 +36,7 @@ app.post('/users/upload', upload.single('file'), async (req, res) => {
 	  	res.status(500).json({result: "unsuccessful", err: "File does not exist on backend"})
 	    return console.log(err)
 	  }
-	  let message = validate(data)
+	  let message = validateCSV(data)
 	  if (!message.isValid) {
 	  	res.status(400).json({result: "unsuccessful", err: message.err})
 	  }
@@ -95,7 +95,7 @@ app.post('/users/upload', upload.single('file'), async (req, res) => {
 	});	
 })
 
-function validate(data) {
+function validateCSV(data) {
 	if (data === "") return {isValid: false, err: "Empty csv file"}
 
 	let rows = data.split("\r\n")
@@ -105,14 +105,21 @@ function validate(data) {
 	if (rows.length === 1) return {isValid: false, err: "csv file has no entry of employee"}
 
 	let numComments = 0
+	let login_list = []
+	let id_list = []
+
 	for (var i = 1; i < rows.length; i++) {
 		if (rows[i].startsWith("#")) {
 			numComments += 1
 			continue
 		}
 		let items = rows[i].split(",")
-		if (items.length !== 4) return {isValid: false, err: "employee entry has wrong number of columns"}
-		if (!(!isNaN(Number(items[3])) && (Number(items[3]) % 1 !== 0 || items[3].endsWith(".0")))) return {isValid: false, err: "salary not a decimal"}
+		if (items.length !== 4) return {isValid: false, err: "csv file error, employee entry has wrong number of columns"}
+		if (!(!isNaN(Number(items[3])) && (Number(items[3]) % 1 !== 0 || items[3].endsWith(".0")))) return {isValid: false, err: "csv file error, salary not a decimal"}
+		if (id_list.includes(items[0])) return {isValid: false, err: "csv file error, id is not unique"}
+		id_list.push(items[0])
+		if (login_list.includes(items[1])) return {isValid: false, err: "csv file error, login is not unique"}
+		login_list.push(items[1])
 	}
 
 	if (numComments === rows.length - 1) return {isValid: false, err: "csv file has no entry of employee"}
