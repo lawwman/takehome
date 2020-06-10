@@ -36,43 +36,38 @@ app.post('/users/upload', upload.single('file'), async (req, res) => {
 	  	res.status(500).json({result: "unsuccessful", err: "File does not exist on backend"})
 	    return console.log(err)
 	  }
-	  let message = validateCSV(data)
+	  let message = await validateCSV(data)
 	  if (!message.isValid) {
 	  	res.status(400).json({result: "unsuccessful", err: message.err})
 	  }
 	  else {
+
 	  	console.log(data)
 	  	let rows = data.split("\r\n")
-	  	let badEntry = false
-	  	let errorMessage = ""
-
-	  	for (var i = 1; i < rows.length; i++) {
-	  		let items = rows[i].split(",")
-	  		let employee_doc = new Employee({employee_id: items[0], login: items[1], name: items[2], salary: Number(items[3])})
-
-	  		try {
-	  			await employee_doc.save()
-	  		}
-
-	  		catch {
-	  			errorMessage = "unknown error updating db"
-	  			badEntry = true
-	  			break
-	  		}
-	  	}
-	  	if (badEntry) {
-	  		console.log(errorMessage)
-	  		res.status(400).json({result: "unsuccessful", err: errorMessage})
-	  	}
-	  	else {
-	  		console.log("successful in updating db")
+	  	try {
+			for (var i = 1; i < rows.length; i++) {
+		  		let items = rows[i].split(",")
+		  		const employees = await Employee.find({employee_id: items[0]})
+		  		if (employees.length === 0) {
+		  			let employee_doc = new Employee({employee_id: items[0], login: items[1], name: items[2], salary: Number(items[3])})
+		  			await employee_doc.save()
+		  		}
+		  		else {
+		  			await Employee.updateOne({employee_id: items[0]}, {login: items[1], name: items[2], salary: Number(items[3])})
+		  		}
+		  	}
+		  	console.log("successful in updating db")
 	  		res.status(200).json({result: "successful"})
 	  	}
+	  	catch {
+  			console.log("unknown error updating db")
+	  		res.status(400).json({result: "unsuccessful", err: "unknown error updating db"})
+  		}
 	  }
 	});	
 })
 
-function validateCSV(data) {
+async function validateCSV(data) {
 	if (data === "") return {isValid: false, err: "Empty csv file"}
 
 	let rows = data.split("\r\n")
@@ -107,10 +102,16 @@ function validateCSV(data) {
 		id_list.push(items[0])
 		if (login_list.includes(items[1])) return {isValid: false, err: "csv file error, login is not unique"}
 		login_list.push(items[1])
+
+		// check for uniqueness of login within db
+		const employees = await Employee.find({login: items[1]})
+		if (employees.length != 0) {
+			if (employees[0].employee_id !== items[0])
+				return {isValid: false, err: "csv file error, login already exists in the database."}
+		}
 	}
 
 	if (numComments === rows.length - 1) return {isValid: false, err: "csv file has no entry of employee"}
-
 	return {isValid: true}
 }
 
