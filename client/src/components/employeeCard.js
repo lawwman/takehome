@@ -13,6 +13,8 @@ class EmployeeCard extends React.Component {
 			  	<span className="card-title">{this.props.info.name}, </span>
 			  	<span className="card-title" style={labelStyle}>Salary: </span>
 			  	<span className="card-title">${this.props.info.salary}</span>
+			  	<button type="button" className="btn btn-primary ml-4">Edit</button>
+				<button type="button" className="btn btn-secondary ml-1">Delete</button>
 			  </div>
 			</div>
 	}
@@ -28,5 +30,6 @@ const labelStyle = {
 	fontStyle: "italic",
 	marginLeft: '15px'
 }
+
 
 export default EmployeeCard
