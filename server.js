@@ -49,29 +49,6 @@ app.post('/users/upload', upload.single('file'), async (req, res) => {
 	  	for (var i = 1; i < rows.length; i++) {
 	  		let items = rows[i].split(",")
 	  		let employee_doc = new Employee({employee_id: items[0], login: items[1], name: items[2], salary: Number(items[3])})
-	  		let errors = employee_doc.validateSync()
-	  		if (errors !== null) {
-	  			if (errors.errors["employee_id"] != null) {
-	  				errorMessage = errors.errors["employee_id"].message
-		  			badEntry = true
-		  			break
-	  			}
-	  			if (errors.errors["login"] != null) {
-	  				errorMessage = errors.errors["login"].message
-		  			badEntry = true
-		  			break
-	  			}
-	  			if (errors.errors["name"] != null) {
-	  				errorMessage = errors.errors["name"].message
-		  			badEntry = true
-		  			break
-	  			}
-		  		if (errors.errors["salary"] != null) {
-		  			errorMessage = errors.errors["salary"].message
-		  			badEntry = true
-		  			break
-		  		}
-	  		}
 
 	  		try {
 	  			await employee_doc.save()
@@ -115,7 +92,17 @@ function validateCSV(data) {
 		}
 		let items = rows[i].split(",")
 		if (items.length !== 4) return {isValid: false, err: "csv file error, employee entry has wrong number of columns"}
-		if (!(!isNaN(Number(items[3])) && (Number(items[3]) % 1 !== 0 || items[3].endsWith(".0")))) return {isValid: false, err: "csv file error, salary not a decimal"}
+		// check if salary is of a correct format
+		if (isNaN(Number(items[3]))) return {isValid: false, err: "csv file error, salary has to be a decimal value"}
+		if (!(Number(items[3]) % 1 !== 0 || items[3].endsWith(".0"))) return {isValid: false, err: "csv file error, salary not a decimal"}
+		if (Number(items[3]) < 0) return {isValid: false, err: "csv file error, salary cannot be less than zero"}
+
+		// check if id, name and login are non-empty strings or blank characters
+		if (items[0].trim().length === 0) return {isValid: false, err: "csv file error, id is blank"}
+		if (items[1].trim().length === 0) return {isValid: false, err: "csv file error, login is blank"}
+		if (items[2].trim().length === 0) return {isValid: false, err: "csv file error, name is blank"}
+
+		// check for uniqueness of login and id
 		if (id_list.includes(items[0])) return {isValid: false, err: "csv file error, id is not unique"}
 		id_list.push(items[0])
 		if (login_list.includes(items[1])) return {isValid: false, err: "csv file error, login is not unique"}

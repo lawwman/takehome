@@ -4,27 +4,20 @@ var EmployeeSchema = new mongoose.Schema({
 	employee_id: {
 		type: String,
 		required: true,
-		unique: true,
-		trim: true,
-		minLength: [1, "empty field is not allowed"]
+		unique: true
 	},
 	login: {
 		type: String,
 		required: true,
-		unique: true,
-		trim: true,
-		minLength: [1, "empty field is not allowed"]
+		unique: true
 	},
 	name: {
 		type: String,
-		required: true,
-		trim: true,
-		minLength: [1, "empty field is not allowed"]
+		required: true
 	},
 	salary: {
 		type: Number,
-		required: true,
-		min: [0, 'Salary cannot be negative.'],
+		required: true
 	}
 })
 
