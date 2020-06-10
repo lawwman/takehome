@@ -4,7 +4,7 @@ class AddForm extends React.Component {
 
 	constructor(props) {
 		super(props)
-		this.state = {file: '', filename: 'Choose file'}
+		this.state = {file: '', filename: 'Choose csv file to upload..'}
 	}
 
 	onChange = e => {
@@ -28,7 +28,10 @@ class AddForm extends React.Component {
 			}).then(res => {
 				return res.json()
 			}).then(data => {
-				if (data.result === "successful") console.log(data.result)
+				if (data.result === "successful") {
+					console.log(data.result)
+					this.props.updateList()
+				}
 				else console.log(data.err)
 			}).catch(() => {
 				console.log("something went wrong")
@@ -38,7 +41,7 @@ class AddForm extends React.Component {
 
 	render() {
 		return  <form onSubmit={this.handleSubmit}>
-					<div className="custom-file mb-4">
+					<div className="custom-file">
 					  <input type="file" className="custom-file-input" id="customFile" onChange={this.onChange} />
 					  <label className="custom-file-label" htmlFor="customFile">{this.state.filename}</label>
 					</div>

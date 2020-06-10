@@ -67,6 +67,19 @@ app.post('/users/upload', upload.single('file'), async (req, res) => {
 	});	
 })
 
+app.get('/users', async (req, res) => {
+	try {
+		const employees = await Employee.find()
+		res.status(200).json({result: "successful", employees: employees})
+	}
+	catch {
+		res.status(500).json({result: "unsuccessful"})
+
+	}
+	
+	
+})
+
 async function validateCSV(data) {
 	if (data === "") return {isValid: false, err: "Empty csv file"}
 
@@ -104,7 +117,7 @@ async function validateCSV(data) {
 		login_list.push(items[1])
 
 		// check for uniqueness of login within db
-		const employees = await Employee.find({login: items[1]})
+		const employees = await Employee.find({login: items[1]}) // Only query 1 document from collection.
 		if (employees.length != 0) {
 			if (employees[0].employee_id !== items[0])
 				return {isValid: false, err: "csv file error, login already exists in the database."}
