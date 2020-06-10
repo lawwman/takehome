@@ -69,8 +69,32 @@ app.post('/users/upload', upload.single('file'), async (req, res) => {
 
 app.get('/users', async (req, res) => {
 	try {
-		const employees = await Employee.find()
-		res.status(200).json({result: "successful", employees: employees})
+		if (req.query.offset === null || req.query.minS === null || req.query.maxS === null || req.query.limit === null || req.query.sort === null) {
+			res.status(400).json({result: "unsuccessful", err: "missing request params"})
+		}
+		else if (isNaN(Number(req.query.minSalary)) || isNaN(Number(req.query.maxSalary)) || isNaN(Number(req.query.limit)) || isNaN(Number(req.query.offset))) {
+			res.status(400).json({result: "unsuccessful", err: "wrong format of request params"})
+		}
+
+		else if (!req.query.sort.startsWith("-") && !req.query.sort.startsWith(" ") || (req.query.sort.substring(1) !== "id" && req.query.sort.substring(1) !== "login" && req.query.sort.substring(1) !== "name" && req.query.sort.substring(1) !== "salary")) {
+			res.status(400).json({result: "unsuccessful", err: "sort problems"})
+		}
+
+		else {
+			let offset = Number(req.query.offset)
+			let minS = Number(req.query.minSalary)
+			let maxS = Number(req.query.maxSalary)
+			let limit = Number(req.query.limit)
+			let sort = req.query.sort
+			let count = await Employee.countDocuments({salary: {$gte: minS, $lte: maxS}})
+			if (offset > count) {
+				res.status(200).json({result: "successful", employees: []})
+			}
+			else {
+				let employees = await Employee.find({salary: {$gte: minS, $lte: maxS}}).sort(sort).skip(offset).limit(limit)
+				res.status(200).json({result: "successful", employees: employees})
+			}
+		}
 	}
 	catch {
 		res.status(500).json({result: "unsuccessful"})

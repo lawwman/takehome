@@ -21,7 +21,7 @@ class App extends React.Component {
 		let order = "+"
 		if (!this.state.ascending) order = "-"
 		let sort = order + this.state.sort
-		fetch(`/users?limit=30&minSalary=${this.state.minS}&maxSalary=${this.state.maxS}&offset=${this.state.offset}&sort=${sort}`, {
+		fetch(`/users?limit=30&minSalary=${this.state.minS}&maxSalary=${this.state.maxS}&offset=${this.state.offset * 30}&sort=${sort}`, {
 			method: "GET"
 		}).then((res) => res.json()).then(data => {
 			if (data.result === "successful") {
