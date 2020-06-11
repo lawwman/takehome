@@ -41,7 +41,7 @@ class App extends React.Component {
 		fetch(`/users/${id}`, {
         method: "PATCH",
         headers: { 'Content-Type': 'application/json'},
-        body: JSON.stringify({login: login, name: name, salary: salary})
+        body: JSON.stringify({id: id, login: login, name: name, salary: salary})
       }).then(async res => {
       	if (res.status === 200) {
       		this.updateEmployeeList()
@@ -52,6 +52,21 @@ class App extends React.Component {
       	}
       })
       .catch(() => console.log("error updating"))
+	}
+
+	deleteEmployee = (id) => {
+		fetch(`/users/${id}`, {
+			method: "DELETE"
+		}).then(async res => {
+      	if (res.status === 200) {
+      		this.updateEmployeeList()
+      	}
+      	else {
+      		let message = await res.text()
+			console.log(message)
+      	}
+      })
+      .catch(() => console.log("error deleting"))
 	}
 
 	toggleSort = (category) => {
@@ -82,7 +97,7 @@ class App extends React.Component {
 	      		setMinSalary={this.setMinSalary} setMaxSalary={this.setMaxSalary} setOffset={this.setOffset}
 	      		minS={this.state.minS} maxS={this.state.maxS} offset={this.state.offset} updateList={this.updateEmployeeList} />
 
-	      		<EmployeeList list={this.state.list} updateEmployee={this.updateEmployee} />
+	      		<EmployeeList list={this.state.list} updateEmployee={this.updateEmployee} deleteEmployee={this.deleteEmployee} />
 	      </div>
 	      </>
 	    );

@@ -125,6 +125,17 @@ app.patch('/users/:id', async (req, res) => {
 		
 })
 
+app.delete('/users/:id', async (req, res) => {
+	let id = req.params.id
+	try {
+		await Employee.deleteOne({id:id})
+		res.status(200).send("deleted employee")
+	}
+	catch {
+		res.status(400).send("failed to delete employee")
+	}
+})
+
 
 async function validateCSV(data) {
 	if (data === "") return {isValid: false, err: "Empty csv file"}

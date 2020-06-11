@@ -22,6 +22,10 @@ class EmployeeCard extends React.Component {
 		else this.props.updateEmployee(this.props.info.id, this.state.login, this.state.name, this.state.salary)
 	}
 
+	deleteEmployee = () => {
+		this.props.deleteEmployee(this.props.info.id)
+	}
+
 	onChangeLogin = e => {
 		this.setState({login: e.target.value})
 	}
@@ -68,7 +72,7 @@ class EmployeeCard extends React.Component {
 			  	<span className="card-title" style={labelStyle}>Salary: </span>
 			  	<span className="card-title">${this.props.info.salary}</span>
 			  	<button type="button" className="btn btn-primary ml-4" onClick={this.editButton}>Edit</button>
-				<button type="button" className="btn btn-danger ml-1">Delete</button>
+				<button type="button" className="btn btn-danger ml-1" onClick={this.deleteEmployee}>Delete</button>
 			  </div>
 			  {editForm}
 			</div>
