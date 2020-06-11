@@ -23,7 +23,8 @@ class EmployeeCard extends React.Component {
 	}
 
 	deleteEmployee = () => {
-		this.props.deleteEmployee(this.props.info.id)
+		let deleteUser = window.confirm("Are you sure you want to delete the user")
+		if (deleteUser) this.props.deleteEmployee(this.props.info.id)
 	}
 
 	onChangeLogin = e => {
