@@ -23,14 +23,18 @@ class App extends React.Component {
 		let sort = order + this.state.sort
 		fetch(`/users?limit=30&minSalary=${this.state.minS}&maxSalary=${this.state.maxS}&offset=${this.state.offset * 30}&sort=${sort}`, {
 			method: "GET"
-		}).then((res) => res.json()).then(data => {
-			if (data.result === "successful") {
-				this.setState({list: data.employees})
-			}
-			else console.log("unsucessful get request")
-		}).catch(() => {
-			console.log("Error fetching")
 		})
+		.then(async (res) => {
+			if (res.status === 200) {
+				let data = await res.json()
+				this.setState({list: data.results})
+			}
+			else {
+				let message = await res.text()
+				console.log(message)
+			}
+		})
+		.catch(() => console.log("error fetching")) 
 	}
 
 	toggleSort = (category) => {

@@ -25,14 +25,12 @@ class AddForm extends React.Component {
 			fetch('./users/upload', {
 			method: 'POST',
 			body: formData
-			}).then(res => {
-				return res.json()
-			}).then(data => {
-				if (data.result === "successful") {
-					console.log(data.result)
-					this.props.updateList()
+			}).then(async res => {
+				if (res.status === 200) this.props.updateList()
+				else {
+					let message = await res.text()
+					console.log(message)
 				}
-				else console.log(data.err)
 			}).catch(() => {
 				console.log("something went wrong")
 			})

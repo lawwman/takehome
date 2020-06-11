@@ -33,12 +33,12 @@ app.post('/users/upload', upload.single('file'), async (req, res) => {
 
 	fs.readFile(req.file.path, 'utf8', async function (err,data) {
 	  if (err) {
-	  	res.status(500).json({result: "unsuccessful", err: "File does not exist on backend"})
+	  	res.status(500).send("Server failed to receive CSV file.")
 	    return console.log(err)
 	  }
 	  let message = await validateCSV(data)
 	  if (!message.isValid) {
-	  	res.status(400).json({result: "unsuccessful", err: message.err})
+	  	res.status(400).send(message.err)
 	  }
 	  else {
 
@@ -47,21 +47,21 @@ app.post('/users/upload', upload.single('file'), async (req, res) => {
 	  	try {
 			for (var i = 1; i < rows.length; i++) {
 		  		let items = rows[i].split(",")
-		  		const employees = await Employee.find({employee_id: items[0]})
+		  		const employees = await Employee.find({id: items[0]})
 		  		if (employees.length === 0) {
-		  			let employee_doc = new Employee({employee_id: items[0], login: items[1], name: items[2], salary: Number(items[3])})
+		  			let employee_doc = new Employee({id: items[0], login: items[1], name: items[2], salary: Number(items[3])})
 		  			await employee_doc.save()
 		  		}
 		  		else {
-		  			await Employee.updateOne({employee_id: items[0]}, {login: items[1], name: items[2], salary: Number(items[3])})
+		  			await Employee.updateOne({id: items[0]}, {login: items[1], name: items[2], salary: Number(items[3])})
 		  		}
 		  	}
 		  	console.log("successful in updating db")
-	  		res.status(200).json({result: "successful"})
+	  		res.status(200).send("Successful in updating db.")
 	  	}
-	  	catch {
+	  	catch (e) {
   			console.log("unknown error updating db")
-	  		res.status(400).json({result: "unsuccessful", err: "unknown error updating db"})
+	  		res.status(400).send("failed in updating db.")
   		}
 	  }
 	});	
@@ -69,15 +69,12 @@ app.post('/users/upload', upload.single('file'), async (req, res) => {
 
 app.get('/users', async (req, res) => {
 	try {
-		if (req.query.offset === null || req.query.minS === null || req.query.maxS === null || req.query.limit === null || req.query.sort === null) {
-			res.status(400).json({result: "unsuccessful", err: "missing request params"})
-		}
-		else if (isNaN(Number(req.query.minSalary)) || isNaN(Number(req.query.maxSalary)) || isNaN(Number(req.query.limit)) || isNaN(Number(req.query.offset))) {
-			res.status(400).json({result: "unsuccessful", err: "wrong format of request params"})
+		if (isNaN(Number(req.query.minSalary)) || isNaN(Number(req.query.maxSalary)) || isNaN(Number(req.query.limit)) || isNaN(Number(req.query.offset))) {
+			res.status(400).send("wrong format of request params")
 		}
 
 		else if (!req.query.sort.startsWith("-") && !req.query.sort.startsWith(" ") || (req.query.sort.substring(1) !== "id" && req.query.sort.substring(1) !== "login" && req.query.sort.substring(1) !== "name" && req.query.sort.substring(1) !== "salary")) {
-			res.status(400).json({result: "unsuccessful", err: "sort problems"})
+			res.status(400).send("sort field not formated properly")
 		}
 
 		else {
@@ -88,16 +85,16 @@ app.get('/users', async (req, res) => {
 			let sort = req.query.sort
 			let count = await Employee.countDocuments({salary: {$gte: minS, $lte: maxS}})
 			if (offset > count) {
-				res.status(200).json({result: "successful", employees: []})
+				res.status(200).json({results: []})
 			}
 			else {
-				let employees = await Employee.find({salary: {$gte: minS, $lte: maxS}}).sort(sort).skip(offset).limit(limit)
-				res.status(200).json({result: "successful", employees: employees})
+				let employees = await Employee.find({salary: {$gte: minS, $lte: maxS}}).sort(sort).skip(offset).limit(limit).select("id login name salary -_id")
+				res.status(200).json({results: employees})
 			}
 		}
 	}
 	catch {
-		res.status(500).json({result: "unsuccessful"})
+		res.status(400).send("missing request params")
 
 	}
 	
@@ -143,7 +140,7 @@ async function validateCSV(data) {
 		// check for uniqueness of login within db
 		const employees = await Employee.find({login: items[1]}) // Only query 1 document from collection.
 		if (employees.length != 0) {
-			if (employees[0].employee_id !== items[0])
+			if (employees[0].id !== items[0])
 				return {isValid: false, err: "csv file error, login already exists in the database."}
 		}
 	}
