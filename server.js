@@ -11,6 +11,8 @@ mongoose.connect('mongodb://localhost/employees', { useNewUrlParser: true, useUn
 
 const port = 5000
 
+let processing = false
+
 app.use(express.urlencoded({ extended:true }))
 app.use(express.json())
 
@@ -33,41 +35,48 @@ const fileFilter = (req, file, cb) => {
 let upload = multer({storage: storage, fileFilter: fileFilter})
 
 app.post('/users/upload', upload.single('file'), async (req, res) => {
-
-	fs.readFile(req.file.path, 'utf8', async function (err,data) {
-	  if (err) {
-	  	res.status(500).send("Server failed to receive CSV file.")
-	    return console.log(err)
-	  }
-	  let message = await validateCSV(data)
-	  if (!message.isValid) {
-	  	res.status(400).send(message.err)
-	  }
-	  else {
-
-	  	console.log(data)
-	  	let rows = data.split("\r\n")
-	  	try {
-			for (var i = 1; i < rows.length; i++) {
-		  		let items = rows[i].split(",")
-		  		const employees = await Employee.find({id: items[0]})
-		  		if (employees.length === 0) {
-		  			let employee_doc = new Employee({id: items[0], login: items[1], name: items[2], salary: Number(items[3])})
-		  			await employee_doc.save()
-		  		}
-		  		else {
-		  			await Employee.updateOne({id: items[0]}, {login: items[1], name: items[2], salary: Number(items[3])})
-		  		}
-		  	}
-		  	console.log("successful in updating db")
-	  		res.status(200).send("Successful in updating db.")
-	  	}
-	  	catch (e) {
-  			console.log("unknown error updating db")
-	  		res.status(400).send("failed in updating db.")
-  		}
-	  }
-	});	
+	if (!processing) {
+		processing = true
+		fs.readFile(req.file.path, 'utf8', async function (err,data) {
+			if (err) {
+				processing = false
+				res.status(500).send("Server failed to receive CSV file.")
+				return console.log(err)
+				}
+				let message = await validateCSV(data)
+				if (!message.isValid) {
+					processing = false
+					res.status(400).send(message.err)
+				}
+				else {
+					console.log(data)
+					let rows = data.split("\r\n")
+					try {
+					for (var i = 1; i < rows.length; i++) {
+				  		let items = rows[i].split(",")
+				  		const employees = await Employee.find({id: items[0]})
+				  		if (employees.length === 0) {
+				  			let employee_doc = new Employee({id: items[0], login: items[1], name: items[2], salary: Number(items[3])})
+				  			await employee_doc.save()
+				  		}
+				  		else {
+				  			await Employee.updateOne({id: items[0]}, {login: items[1], name: items[2], salary: Number(items[3])})
+				  		}
+				  	}
+				  	processing = false
+				  	console.log("successful in updating db")
+					res.status(200).send("Successful in updating db.")
+					}
+					catch (e) {
+						processing = false
+						console.log("unknown error updating db")
+						res.status(400).send("failed in updating db.")
+					}
+				}
+			});	
+	}
+	else res.status(400).send("no concurrent uploads allowed.")
+	
 })
 
 app.get('/users', async (req, res) => {
