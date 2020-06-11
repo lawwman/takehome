@@ -37,6 +37,23 @@ class App extends React.Component {
 		.catch(() => console.log("error fetching")) 
 	}
 
+	updateEmployee = (id, login, name, salary) => {
+		fetch(`/users/${id}`, {
+        method: "PATCH",
+        headers: { 'Content-Type': 'application/json'},
+        body: JSON.stringify({login: login, name: name, salary: salary})
+      }).then(async res => {
+      	if (res.status === 200) {
+      		this.updateEmployeeList()
+      	}
+      	else {
+      		let message = await res.text()
+			console.log(message)
+      	}
+      })
+      .catch(() => console.log("error updating"))
+	}
+
 	toggleSort = (category) => {
 		if (category === this.state.sort)
 			this.setState({ascending: !this.state.ascending})
@@ -65,7 +82,7 @@ class App extends React.Component {
 	      		setMinSalary={this.setMinSalary} setMaxSalary={this.setMaxSalary} setOffset={this.setOffset}
 	      		minS={this.state.minS} maxS={this.state.maxS} offset={this.state.offset} updateList={this.updateEmployeeList} />
 
-	      		<EmployeeList list={this.state.list} />
+	      		<EmployeeList list={this.state.list} updateEmployee={this.updateEmployee} />
 	      </div>
 	      </>
 	    );

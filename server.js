@@ -11,6 +11,9 @@ mongoose.connect('mongodb://localhost/employees', { useNewUrlParser: true, useUn
 
 const port = 5000
 
+app.use(express.urlencoded({ extended:true }))
+app.use(express.json())
+
 const storage = multer.diskStorage({
 	destination: function(req, file, cb) {
 		cb(null, './uploads/')
@@ -95,11 +98,33 @@ app.get('/users', async (req, res) => {
 	}
 	catch {
 		res.status(400).send("missing request params")
-
 	}
-	
-	
 })
+
+app.patch('/users/:id', async (req, res) => {
+	let id = req.params.id
+	try {
+		// check if new login is unique in db
+		let employees = await Employee.find({name: req.body.name})
+		if (employees.length === 0) {
+			await Employee.updateOne({id: id}, {login: req.body.login, name: req.body.name, salary: Number(req.body.salary)})	
+			res.status(200).send("updated employee")
+		}
+		else {
+			// if login is not unique, then check if it belongs to same id (same person)
+			if (employees[0].id === id) {
+				await Employee.updateOne({id: id}, {login: req.body.login, name: req.body.name, salary: Number(req.body.salary)})
+				res.status(200).send("updated employee")
+			}
+			else res.status(400).send("login has to be unique")
+		}
+	}
+	catch {
+		res.status(400).send("failed to update employee")
+	}
+		
+})
+
 
 async function validateCSV(data) {
 	if (data === "") return {isValid: false, err: "Empty csv file"}
