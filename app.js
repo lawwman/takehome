@@ -106,7 +106,7 @@ app.patch('/users/:id', async (req, res) => {
 	let id = req.params.id
 	try {
 		// check if new login is unique in db
-		let employees = await Employee.find({name: req.body.name})
+		let employees = await Employee.find({login: req.body.login})
 		if (employees.length === 0) {
 			await Employee.updateOne({id: id}, {login: req.body.login, name: req.body.name, salary: Number(req.body.salary)})	
 			res.status(200).send("updated employee")
