@@ -164,4 +164,32 @@ describe('POST /users/upload', () => {
 			done(e)
 		})
 	})
+
+	it('Ok, uploading csv file with non-unique login fails', (done) => {
+		request(app).post('/users/upload')
+		.attach('file', './test/csv_data/not_valid_single_entry_with_non_unique_login.csv')
+		.then((res) => {
+			expect(res.text).to.equal("csv file error, login is not unique")
+			expect(res.status).to.equal(400)
+			done()
+		})
+		.catch((e) => {
+			console.log("something went wrong")
+			done(e)
+		})
+	})
+
+	it('Ok, uploading csv file with non-unique id fails', (done) => {
+		request(app).post('/users/upload')
+		.attach('file', './test/csv_data/not_valid_single_entry_with_non_unique_id.csv')
+		.then((res) => {
+			expect(res.text).to.equal("csv file error, id is not unique")
+			expect(res.status).to.equal(400)
+			done()
+		})
+		.catch((e) => {
+			console.log("something went wrong")
+			done(e)
+		})
+	})
 })
