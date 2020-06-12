@@ -43,10 +43,10 @@ app.post('/users/upload', upload.single('file'), async (req, res) => {
 					res.status(400).send(message.err)
 				}
 				else {
-					console.log(data)
 					let rows = data.split("\r\n")
 					try {
 					for (var i = 1; i < rows.length; i++) {
+						if (rows[i].startsWith('#')) continue
 				  		let items = rows[i].split(",")
 				  		const employees = await Employee.find({id: items[0]})
 				  		if (employees.length === 0) {
@@ -58,12 +58,10 @@ app.post('/users/upload', upload.single('file'), async (req, res) => {
 				  		}
 				  	}
 				  	processing = false
-				  	console.log("successful in updating db")
 					res.status(200).send("Successful in updating db.")
 					}
 					catch (e) {
 						processing = false
-						console.log("unknown error updating db")
 						res.status(400).send("failed in updating db.")
 					}
 				}
@@ -136,6 +134,16 @@ app.delete('/users/:id', async (req, res) => {
 	}
 	catch {
 		res.status(400).send("failed to delete employee")
+	}
+})
+
+app.delete('/clearAllUsers', async (req, res) => {
+	try {
+		await Employee.deleteMany({})
+		res.status(200).send("Cleared the database.")
+	}
+	catch {
+		res.status(500).send("Something went wrong with clearing")
 	}
 })
 
