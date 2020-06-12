@@ -1,5 +1,7 @@
 # Take home assignment from GovTech
 
+I have attempted user stories 1, 2 and 3.
+
 This application is built with the MERN stack - MongoDB, ExpressJS, ReactJS and NodeJS.
 
 I chose to use the ReactJS libary because I wanted to create a dashboard that is very responsive and shows results of user in real time without having
@@ -21,12 +23,17 @@ To run the application, use `npm run dev`, which will concurrently run both the 
 
 More info on the scripts can be seen in the `package.json` file.
 
+The dashboard should look like this:
+![dashboard](./images/dashboard.PNG)
+
 # Project Structure
 The main files are `./server.js` (Main file for server side) and `./client/src/App.js` (Main file for client side). 
 
 
 # Testing
 To run the tests, run the command `npm run test` which will run a mocha command to recursively set off the unit tests in the `./test/api/employees` folder.
+
+The unit testing is done with `chai`, `supertest` and `mocha`. Efforts were made to incorporate `mockgoose` but I believe the version of mongodb that I have might be incompatible.
 
 The outcome should look like this:
 ![test_outcome](./images/test_outcome.PNG)
