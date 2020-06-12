@@ -13,6 +13,8 @@ Given another chance, I might go with PostgreSQL. MongoDB does not have good sup
 
 The CSS is done very simply with Bootstrap. If given more time, I would have attempted to use my own css stylings with SASS.
 
+Last commit made on 12/6/2020, before 2200. Deadline was 2359.
+
 
 # To install and setup
 Make sure the machine has mongodb and node installed.
