@@ -29,7 +29,7 @@ The main files are `./server.js` (Main file for server side) and `./client/src/A
 To run the tests, run the command `npm run test` which will run a mocha command to recursively set off the unit tests in the `./test/api/employees` folder.
 
 The outcome should look like this:
-![test_outcome](./images/test_outcome.png)
+![test_outcome](./images/test_outcome.PNG)
 
 
 
